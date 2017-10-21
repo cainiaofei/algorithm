@@ -76,6 +76,8 @@ class Ideone {
 				}
 			}
 		}
+		
+		
 		System.out.println("MaxSum: " + maxSum + ", range: [(" + left + ", " 
 				+ top + ")(" + right + ", " + bottom + ")]");
 	}
