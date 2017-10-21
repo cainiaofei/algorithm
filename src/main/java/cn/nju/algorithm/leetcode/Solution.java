@@ -1,38 +1,23 @@
 package cn.nju.algorithm.leetcode;
-
+/**
+ * @author zzf 
+ * @date 2017/10/21
+ * @description the algorithm  used is very complicate, this time is beautiful. 
+ */
 class Solution {
-    public int maxSumSubmatrix(int[][] matrix, int k) {
-    	int maxSum = Integer.MIN_VALUE;
-		for(int leftRow=0; leftRow<matrix.length; leftRow++) {
-			for(int leftCol=0; leftCol<matrix[leftRow].length;leftCol++) {
-				for(int rightRow=leftRow; rightRow<matrix.length;rightRow++) {
-					for(int rightCol=leftCol;rightCol<matrix[rightRow].length;rightCol++) {
-						int record = maxSum;
-						maxSum = Math.max(maxSum, getSubSum(matrix,leftRow,leftCol,rightRow,rightCol));
-						if(maxSum>k) {
-							maxSum = record;
-						}
-					}
-				}
-			}
-		}
-		return maxSum;
+    public int maxSubArray(int[] nums) {
+        int max = nums[0];
+        int[] dp = new int[nums.length];
+        for(int i = 1; i < nums.length;i++) {
+        	dp[i] = Math.max(dp[i-1]+nums[i], nums[i]);
+        	max = Math.max(max, dp[i]);
+        }
+        return max;
     }
     
-    private int getSubSum(int[][] matrix, int leftRow, int leftCol, int rightRow, int rightCol) {
-		int sum = 0;
-		for(int row=leftRow;row<=rightRow;row++) {
-			for(int col=leftCol;col<=rightCol;col++) {
-				sum += matrix[row][col];
-			}
-		}
-		return sum;
-	}
-    
     public static void main(String[] args) {
+    	int[] nums = {-2,1,-3,4,-1,2,1,-5,4};
     	Solution s = new Solution();
-    	int[][] matrix = {{2,2,-1}};
-    	int k = 0;
-    	System.out.println(s.maxSumSubmatrix(matrix, k));
+    	System.out.println(s.maxSubArray(nums));
     }
 }
