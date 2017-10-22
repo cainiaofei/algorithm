@@ -55,7 +55,7 @@ class NumArray {
 }
 
 /**
- * Your NumArray object will be instantiated and called as such:
- * NumArray obj = new NumArray(nums);
+ * Your Range_Sum_Query object will be instantiated and called as such:
+ * Range_Sum_Query obj = new Range_Sum_Query(nums);
  * int param_1 = obj.sumRange(i,j);
  */
