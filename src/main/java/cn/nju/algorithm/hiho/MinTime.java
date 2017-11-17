@@ -8,7 +8,7 @@ import java.util.Scanner;
  * @date 2017.10.07
  * @description Robots Crossing River, the bottleneck of this problem is from B to C.
  */
-public class Main {
+public class MinTime {
 	
 	public void process() {
 		Scanner scan = new Scanner(System.in);
@@ -48,7 +48,7 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
-		Main m = new Main();
+		MinTime m = new MinTime();
 		m.process();
 	}
 }
