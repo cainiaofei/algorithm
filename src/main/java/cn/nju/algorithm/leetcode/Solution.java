@@ -1,100 +1,122 @@
 package cn.nju.algorithm.leetcode;
+ 
 
 /**
  * @author zzf
  * @date 2017.11.28
- * @description algorithm: find the max value from right to left, example: 1244988891, the second 9 from right is 
- * 	what we learn and then after swap the digit change to 9244988811.
- * 
- * @bug Input: 98368
- *      Output: 98368
- *      Expected: 98863
- * @fix_strategy swap mean there should be two numbers, first: find the first position of the former. The former
- * interval if exist should meet this rule: the first value which violate desending order. then we can be sure the 
- * former should in [0,..]. Then we get max value int right interval [..+1,len-1], then find the former actual position
- * through max value in right.
- */
-class Solution {
-    public int maximumSwap(int num) {
-        char[] chs = (num+"").toCharArray();
-        int[] arr = transferToInt(chs);
-        //find left interval
-        int leftBorder = getLeftBorder(arr);
-        if(leftBorder==arr.length-1) {
-        	return num;
-        }
-        else {
-        	int rightPos = getMaxRightValue(arr,leftBorder+1);
-        	int leftPos = findActualPosInLeft(arr,leftBorder,rightPos);
-        	swap(arr,leftPos,rightPos);
-            StringBuilder sb = new StringBuilder();
-            for(int ele:arr) {
-            	sb.append(ele);
-            }
-            return Integer.valueOf(sb.toString());
-        }
+ * @problem Trim a Binary Search Tree
+ * @description this question is to how to delete node in BST, It will be easy if the deleted node is leaf
+ * 	 or it just has one child. Else, its right node replace its position and the left child of its right child will
+ *  append the right of its left child, the its left become child of its right.
+ *  Example                  6                            6
+ *                          / \                          / \
+ *                          4 17       delete 17        4  22
+ *                            / \      =========>          / \
+ *                           10 22                        10 40
+ *                            \ / \                        \
+ *                           18 20 40                      18
+ *                                                          \
+ * @bug Runtime Error Message: Line 36: java.lang.NullPointerException
+ *       Last executed input: [1,0,2] 1 2    
+ * @bug [3,1,4,null,2] 1 2
+ *	     Output: [4,1,null,null,2]
+ *	     Expected: [1,null,2]                                                  
+ */ 
+class TreeNode {
+      int val;
+      TreeNode left;
+      TreeNode right;
+      TreeNode(int x) { val = x; }
+  }
+ 
+public class Solution {
+    public TreeNode trimBST(TreeNode root, int left, int right) {
+    	TreeNode header = new TreeNode(1);
+    	header.left = root;
+    	dfs(header,left,right);
+    	return header.left;
     }
     
-    private int findActualPosInLeft(int[] arr, int leftBorder, int rightPos) {
-		return findFirstLessThanTarget(arr,0,leftBorder,arr[rightPos]);
-	}
-    
-    private int findFirstLessThanTarget(int[] arr,int left,int right,int target) {
-    	if(left>right) {
-    		return left;
+    private void dfs(TreeNode tn,int left,int right) {
+    	if(tn==null) {
+    		return ;
     	}
-    	else {
-    		int mid = (left + right) / 2;
-    		if(target>arr[mid]) {
-    			return findFirstLessThanTarget(arr,left,mid-1,target);
+    	//adjust left and right
+    	if(tn.left!=null) {
+    		int leftValue = tn.left.val;
+    		if(!(leftValue>=left && leftValue<=right)) {
+    			tn.left = adjustBST(tn.left);
+    			dfs(tn,left,right);
     		}
     		else {
-    			return findFirstLessThanTarget(arr,mid+1,right,target);
+    			dfs(tn.left,left,right);
+    		}
+    	}
+    	
+    	if(tn.right!=null) {
+    		int rightValue = tn.right.val;
+    		if(!(rightValue>=left && rightValue<=right)) {
+    			tn.right = adjustBST(tn.right);
+    			dfs(tn,left,right);
+    		}
+    		else {
+    			dfs(tn.right,left,right);
     		}
     	}
     }
-
-	private int getMaxRightValue(int[] arr, int start) {
-		int max = arr[start];
-		int pos = start;
-		for(int i = start+1; i < arr.length;i++) {
-			if(max<=arr[i]) {
-				pos = i;
-				max = arr[i];
-			}
+    
+    private TreeNode adjustBST(TreeNode tn) {
+    	if(tn.left==null && tn.right==null) {
+    		tn = null;
+    	}
+    	else if(tn.left==null||tn.right==null) {
+    		tn = (tn.left==null)?tn.right:tn.left;
+    	}
+    	else {
+    		TreeNode rightLeafInLeftChild = getRightLeafInLeftChild(tn.left);
+    		rightLeafInLeftChild.right = tn.right.left;
+    		tn.right.left = tn.left;
+    		tn = tn.right;
+    	}
+    	
+    	return tn;
+    }
+    
+    private void adjustBST(TreeNode parent, TreeNode tn) {
+    	if(tn.left==null && tn.right==null) {
+    		tn = null;
+    	}
+    	else if(tn.left==null||tn.right==null) {
+    		tn = (tn.left==null)?tn.right:tn.right;
+    	}
+    	else {
+    		TreeNode rightLeafInLeftChild = getRightLeafInLeftChild(tn.left);
+    		rightLeafInLeftChild.right = tn.right.left;
+    		tn.right.left = tn.left;
+    		tn = tn.right;
+    	}
+    	
+    	if(parent.val>tn.val) {
+    		parent.left = tn;
+    	}
+    	else {
+    		parent.right = tn;
+    	}
+    }
+    
+    private TreeNode getRightLeafInLeftChild(TreeNode root) {
+		while(root.right!=null) {
+			root = root.right;
 		}
-		return pos;
-	}
-
-	/**
-     * descend orfer 
-     */
-    private int getLeftBorder(int[] arr) {
-		for(int i = 0; i < arr.length-1;i++) {
-			if(arr[i]<arr[i+1]) {
-				return i;
-			}
-		}
-		return arr.length-1;
-	}
-
-	private void swap(int[] arr, int former, int latter) {
-    	int temp = arr[former];
-    	arr[former] = arr[latter];
-    	arr[latter] = temp;
-	}
-
-	private int[] transferToInt(char[] chs) {
-		int[] arr = new int[chs.length];
-		for(int i = 0; i < chs.length;i++) {
-			arr[i] = (int)(chs[i]-'0');
-		}
-		return arr;
+		return root;
 	}
 
 	public static void main(String[] args) {
     	Solution s = new Solution();
-    	int num = 98368;
-    	System.out.println(s.maximumSwap(num));
+    	TreeNode tn = new TreeNode(3);
+    	tn.left = new TreeNode(1);
+    	tn.right = new TreeNode(4);
+    	tn.left.right = new TreeNode(2);
+    	s.trimBST(tn, 1, 2);
     }
 }
